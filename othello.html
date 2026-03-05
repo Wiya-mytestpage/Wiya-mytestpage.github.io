@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS // OTHELLO</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #f0f2f5;
+    --surface: #ffffff;
+    --panel:   #e8ecf2;
+    --border:  #c8d0dc;
+    --deep:    #0a0e1a;
+    --accent:  #0057ff;
+    --cyan:    #00c8ff;
+    --red:     #ff2b4e;
+    --orange:  #ff6b00;
+    --text:    #0a0e1a;
+    --muted:   #7a8a9e;
+    --mono:    'Share Tech Mono', monospace;
+    --sans:    'Rajdhani', sans-serif;
+    --jp:      'Noto Sans JP', sans-serif;
+    --board-bg: #0a1628;
+    --board-line: #1a3a5c;
+    --hint:    rgba(0,200,255,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--jp);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L56 80 L56 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L0 80 L0 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3C/svg%3E");
+    opacity: .35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ══ HEADER ══ */
+  header {
+    position: relative;
+    z-index: 10;
+    background: var(--deep);
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scanline 4s linear infinite;
+    top: 0;
+  }
+
+  @keyframes scanline {
+    0%   { top: 0; opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: .15em;
+    transition: color .2s;
+  }
+  .back-btn:hover { color: var(--cyan); }
+
+  .header-divider { width: 1px; height: 24px; background: #333; }
+
+  .header-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--cyan);
+    letter-spacing: .25em;
+  }
+
+  .header-title {
+    font-family: var(--sans);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .1em;
+    margin-left: auto;
+  }
+
+  .header-title span { color: var(--cyan); font-weight: 300; }
+
+  /* ══ NAV ══ */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(240,242,245,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-logo {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--accent);
+    letter-spacing: .1em;
+    padding: 14px 24px 14px 0;
+    border-right: 1px solid var(--border);
+    margin-right: 8px;
+  }
+
+  nav a {
+    font-family: var(--sans);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 16px 18px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    position: relative;
+    transition: color .2s;
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 18px; right: 18px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform .2s;
+  }
+
+  nav a:hover { color: var(--accent); }
+  nav a:hover::after { transform: scaleX(1); }
+  nav a.active { color: var(--accent); }
+  nav a.active::after { transform: scaleX(1); }
+
+  /* ══ MAIN LAYOUT ══ */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ══ BOARD AREA ══ */
+  .board-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+
+  .sec-num {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--accent);
+    background: rgba(0,87,255,.07);
+    border: 1px solid rgba(0,87,255,.2);
+    padding: 4px 10px;
+    letter-spacing: .1em;
+  }
+
+  .sec-title {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+
+  .sec-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* Score bar */
+  .score-bar {
+    background: var(--deep);
+    border: 1px solid rgba(0,200,255,.15);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .score-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .score-disk {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .disk-black { background: #1a1a2e; border: 2px solid #4488ff; color: #4488ff; }
+  .disk-white { background: #fff; border: 2px solid #ccc; color: #ccc; }
+
+  .score-name {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: var(--muted);
+    letter-spacing: .1em;
+  }
+
+  .score-count {
+    font-family: var(--sans);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .score-vs {
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--muted);
+    padding: 0 8px;
+  }
+
+  .turn-indicator {
+    font-family: var(--mono);
+    font-size: .55rem;
+    padding: 4px 10px;
+    letter-spacing: .1em;
+    border: 1px solid;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .turn-you   { color: #4488ff; border-color: rgba(68,136,255,.4); background: rgba(68,136,255,.08); }
+  .turn-ai    { color: var(--orange); border-color: rgba(255,107,0,.4); background: rgba(255,107,0,.08); }
+  .turn-none  { color: var(--muted); border-color: rgba(122,138,158,.3); background: transparent; animation: none; }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+
+  /* Board */
+  .board-container {
+    background: var(--deep);
+    border: 1px solid rgba(0,200,255,.15);
+    padding: 16px;
+    display: inline-block;
+    width: 100%;
+  }
+
+  #board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 3px;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+
+  .cell {
+    background: var(--board-bg);
+    border: 1px solid var(--board-line);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background .15s;
+    aspect-ratio: 1;
+  }
+
+  .cell:hover { background: #0d2040; }
+  .cell.hint  { background: var(--hint); }
+  .cell.hint::after {
+    content: '';
+    width: 28%;
+    height: 28%;
+    border-radius: 50%;
+    background: var(--cyan);
+    opacity: .6;
+  }
+
+  .piece {
+    width: 76%;
+    height: 76%;
+    border-radius: 50%;
+    position: absolute;
+    transition: transform .15s;
+  }
+
+  .piece.black {
+    background: radial-gradient(circle at 35% 35%, #3a4a7a, #0d1428);
+    border: 2px solid #4488ff;
+    box-shadow: 0 0 8px rgba(68,136,255,.5), inset 0 1px 2px rgba(255,255,255,.1);
+  }
+
+  .piece.white {
+    background: radial-gradient(circle at 35% 35%, #ffffff, #c8d4e8);
+    border: 2px solid #aabbcc;
+    box-shadow: 0 0 6px rgba(200,220,255,.4), inset 0 1px 2px rgba(255,255,255,.8);
+  }
+
+  .piece.flip {
+    animation: flip .3s ease-in-out;
+  }
+
+  @keyframes flip {
+    0%   { transform: scaleX(1); }
+    50%  { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+  }
+
+  /* ══ SIDE PANEL ══ */
+  .side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .panel-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+  }
+
+  .panel-box.dark {
+    background: var(--deep);
+    border-top-color: var(--cyan);
+  }
+
+  .panel-head {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(0,200,255,.12);
+  }
+
+  .panel-dark-head {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(0,200,255,.12);
+  }
+
+  .panel-body { padding: 16px; }
+
+  /* Difficulty selector */
+  .diff-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .diff-btn {
+    font-family: var(--mono);
+    font-size: .62rem;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: .1em;
+    text-align: left;
+    transition: all .15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .diff-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,87,255,.05); }
+  .diff-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(0,87,255,.08); }
+  .diff-btn .diff-tag { font-size: .5rem; opacity: .7; }
+
+  /* Start button */
+  .start-btn {
+    width: 100%;
+    font-family: var(--sans);
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    padding: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background .2s, transform .1s;
+    margin-top: 4px;
+  }
+
+  .start-btn:hover { background: #003ecc; transform: translateY(-1px); }
+  .start-btn:active { transform: translateY(0); }
+
+  /* Log */
+  .log-list {
+    max-height: 180px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .log-list::-webkit-scrollbar { width: 4px; }
+  .log-list::-webkit-scrollbar-track { background: transparent; }
+  .log-list::-webkit-scrollbar-thumb { background: var(--board-line); }
+
+  .log-entry {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: var(--muted);
+    padding: 6px 16px;
+    border-bottom: 1px solid rgba(0,200,255,.06);
+    line-height: 1.6;
+    display: flex;
+    gap: 8px;
+  }
+
+  .log-entry .log-tag { flex-shrink: 0; }
+  .log-entry.you  .log-tag { color: #4488ff; }
+  .log-entry.ai   .log-tag { color: var(--orange); }
+  .log-entry.sys  .log-tag { color: var(--cyan); }
+  .log-entry.warn .log-tag { color: var(--red); }
+
+  /* Result overlay */
+  .result-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,14,26,.85);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s;
+  }
+
+  .result-overlay.show { opacity: 1; pointer-events: all; }
+
+  .result-box {
+    background: var(--deep);
+    border: 1px solid rgba(0,200,255,.3);
+    border-top: 3px solid var(--cyan);
+    padding: 48px 56px;
+    text-align: center;
+    min-width: 320px;
+    transform: translateY(20px);
+    transition: transform .4s;
+  }
+
+  .result-overlay.show .result-box { transform: translateY(0); }
+
+  .result-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--cyan);
+    letter-spacing: .3em;
+    margin-bottom: 16px;
+  }
+
+  .result-title {
+    font-family: var(--sans);
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    margin-bottom: 8px;
+  }
+
+  .result-win  { color: var(--cyan); }
+  .result-lose { color: var(--red); }
+  .result-draw { color: var(--orange); }
+
+  .result-score {
+    font-family: var(--mono);
+    font-size: .75rem;
+    color: var(--muted);
+    margin-bottom: 32px;
+    letter-spacing: .1em;
+  }
+
+  .result-btn {
+    font-family: var(--sans);
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    padding: 14px 32px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background .2s;
+  }
+
+  .result-btn:hover { background: #003ecc; }
+
+  /* Footer */
+  footer {
+    background: var(--deep);
+    border-top: 1px solid rgba(0,200,255,.15);
+    padding: 24px 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .f-title { font-family: var(--sans); font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: .15em; }
+  .f-copy  { font-family: var(--mono); font-size: .55rem; color: var(--muted); }
+
+  @media (max-width: 700px) {
+    main { grid-template-columns: 1fr; padding: 24px 16px 60px; }
+    .header-title { font-size: 1.1rem; }
+  }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  .fade-in { animation: fadeIn .5s both; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="back-btn" href="index.html">← BACK TO TOP</a>
+    <div class="header-divider"></div>
+    <div class="header-label">MODULE // 01 &nbsp;·&nbsp; GAMES</div>
+    <div class="header-title">OTHELLO <span>//</span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">NX</div>
+    <a href="index.html">TOP</a>
+    <a href="#" class="active">GAMES</a>
+    <a href="#">BBS</a>
+    <a href="#">DIARY</a>
+    <a href="#">PROFILE</a>
+  </div>
+</nav>
+
+<main>
+  <!-- ══ BOARD ══ -->
+  <div class="board-wrap fade-in">
+    <div class="sec-head">
+      <span class="sec-num">GAME</span>
+      <span class="sec-title">OTHELLO &nbsp;// VS AI</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <!-- Score -->
+    <div class="score-bar">
+      <div class="score-player">
+        <div class="score-disk disk-black"></div>
+        <div>
+          <div class="score-name">YOU</div>
+          <div class="score-count" id="score-black">2</div>
+        </div>
+      </div>
+      <div style="flex:1;text-align:center">
+        <div id="turn-label" class="turn-indicator turn-none">READY</div>
+      </div>
+      <div class="score-player" style="flex-direction:row-reverse;text-align:right">
+        <div class="score-disk disk-white"></div>
+        <div>
+          <div class="score-name">AI</div>
+          <div class="score-count" id="score-white">2</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Board -->
+    <div class="board-container">
+      <div id="board"></div>
+    </div>
+  </div>
+
+  <!-- ══ SIDE ══ -->
+  <div class="side-panel fade-in">
+
+    <!-- Difficulty -->
+    <div class="panel-box">
+      <div class="panel-head">// DIFFICULTY</div>
+      <div class="panel-body">
+        <div class="diff-options">
+          <button class="diff-btn selected" data-level="1">
+            EASY <span class="diff-tag">初心者向け</span>
+          </button>
+          <button class="diff-btn" data-level="2">
+            NORMAL <span class="diff-tag">標準</span>
+          </button>
+          <button class="diff-btn" data-level="3">
+            HARD <span class="diff-tag">歯ごたえあり</span>
+          </button>
+        </div>
+        <button class="start-btn" id="start-btn">▶ START GAME</button>
+      </div>
+    </div>
+
+    <!-- Battle log -->
+    <div class="panel-box dark">
+      <div class="panel-dark-head">// BATTLE LOG</div>
+      <div class="log-list" id="log-list">
+        <div class="log-entry sys"><span class="log-tag">[SYS]</span><span>難易度を選んでスタートしてください</span></div>
+      </div>
+    </div>
+
+    <!-- Rules -->
+    <div class="panel-box">
+      <div class="panel-head">// RULES</div>
+      <div class="panel-body" style="font-size:.75rem;color:var(--muted);line-height:2;font-weight:300;">
+        ・あなたは <span style="color:#4488ff;font-weight:700">黒</span>、AIは <span style="color:#aabbcc;font-weight:700">白</span><br>
+        ・相手の石を挟むと自分の色に変わる<br>
+        ・置ける場所がない場合はパス<br>
+        ・両者置けなくなったら終了<br>
+        ・石が多い方が勝ち
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Result overlay -->
+<div class="result-overlay" id="result-overlay">
+  <div class="result-box">
+    <div class="result-label">// GAME OVER</div>
+    <div class="result-title" id="result-title">WIN</div>
+    <div class="result-score" id="result-score">BLACK 0 - 0 WHITE</div>
+    <button class="result-btn" id="result-close">▶ PLAY AGAIN</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="f-title">NEXUS</div>
+    <div class="f-copy">&copy; 2025 NEXUS // GAMES MODULE</div>
+  </div>
+</footer>
+
+<script>
+// ══════════════════════════════════
+//  OTHELLO ENGINE
+// ══════════════════════════════════
+
+const EMPTY = 0, BLACK = 1, WHITE = 2;
+const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+
+// Corner/edge weights for AI evaluation
+const WEIGHT = [
+  [100,-20,10, 5, 5,10,-20,100],
+  [-20,-50,-2,-2,-2,-2,-50,-20],
+  [ 10, -2,  1, 1, 1, 1, -2, 10],
+  [  5, -2,  1, 1, 1, 1, -2,  5],
+  [  5, -2,  1, 1, 1, 1, -2,  5],
+  [ 10, -2,  1, 1, 1, 1, -2, 10],
+  [-20,-50,-2,-2,-2,-2,-50,-20],
+  [100,-20,10, 5, 5,10,-20,100],
+];
+
+let board = [], currentTurn = EMPTY, gameActive = false, aiLevel = 1, aiThinking = false;
+
+function initBoard() {
+  board = Array.from({length:8}, () => Array(8).fill(EMPTY));
+  board[3][3] = WHITE; board[3][4] = BLACK;
+  board[4][3] = BLACK; board[4][4] = WHITE;
+}
+
+function inBounds(r,c) { return r>=0&&r<8&&c>=0&&c<8; }
+
+function getFlips(b, r, c, color) {
+  if (b[r][c] !== EMPTY) return [];
+  const opp = color===BLACK?WHITE:BLACK;
+  let all = [];
+  for (const [dr,dc] of DIRS) {
+    let line=[], nr=r+dr, nc=c+dc;
+    while (inBounds(nr,nc) && b[nr][nc]===opp) {
+      line.push([nr,nc]);
+      nr+=dr; nc+=dc;
+    }
+    if (line.length>0 && inBounds(nr,nc) && b[nr][nc]===color) all=[...all,...line];
+  }
+  return all;
+}
+
+function getLegal(b, color) {
+  const moves=[];
+  for (let r=0;r<8;r++) for (let c=0;c<8;c++)
+    if (b[r][c]===EMPTY && getFlips(b,r,c,color).length>0) moves.push([r,c]);
+  return moves;
+}
+
+function applyMove(b, r, c, color) {
+  const nb = b.map(row=>[...row]);
+  const flips = getFlips(nb,r,c,color);
+  nb[r][c]=color;
+  for (const [fr,fc] of flips) nb[fr][fc]=color;
+  return {board:nb, flips};
+}
+
+function countBoard(b) {
+  let bl=0,wh=0;
+  for (let r=0;r<8;r++) for (let c=0;c<8;c++) {
+    if (b[r][c]===BLACK) bl++;
+    else if (b[r][c]===WHITE) wh++;
+  }
+  return {black:bl, white:wh};
+}
+
+// ── AI ──
+
+function evalBoard(b) {
+  let score=0;
+  for (let r=0;r<8;r++) for (let c=0;c<8;c++) {
+    if (b[r][c]===WHITE) score+=WEIGHT[r][c];
+    else if (b[r][c]===BLACK) score-=WEIGHT[r][c];
+  }
+  return score;
+}
+
+function minimax(b, depth, alpha, beta, maximizing) {
+  const color = maximizing ? WHITE : BLACK;
+  const moves = getLegal(b, color);
+  if (depth===0 || moves.length===0) return evalBoard(b);
+  if (maximizing) {
+    let best=-Infinity;
+    for (const [r,c] of moves) {
+      const {board:nb} = applyMove(b,r,c,WHITE);
+      best = Math.max(best, minimax(nb, depth-1, alpha, beta, false));
+      alpha = Math.max(alpha, best);
+      if (beta<=alpha) break;
+    }
+    return best;
+  } else {
+    let best=Infinity;
+    for (const [r,c] of moves) {
+      const {board:nb} = applyMove(b,r,c,BLACK);
+      best = Math.min(best, minimax(nb, depth-1, alpha, beta, true));
+      beta = Math.min(beta, best);
+      if (beta<=alpha) break;
+    }
+    return best;
+  }
+}
+
+function aiMove() {
+  const moves = getLegal(board, WHITE);
+  if (moves.length===0) return null;
+
+  if (aiLevel===1) {
+    // Easy: mostly random, slight preference for legal moves
+    const shuffled = [...moves].sort(() => Math.random()-.5);
+    return shuffled[0];
+  }
+
+  if (aiLevel===2) {
+    // Normal: depth 3 minimax
+    let best=-Infinity, bestMove=moves[0];
+    for (const [r,c] of moves) {
+      const {board:nb} = applyMove(board,r,c,WHITE);
+      const score = minimax(nb, 3, -Infinity, Infinity, false);
+      const noise = (Math.random()-.5)*10; // small randomness
+      if (score+noise > best) { best=score+noise; bestMove=[r,c]; }
+    }
+    return bestMove;
+  }
+
+  // Hard: depth 5 minimax
+  let best=-Infinity, bestMove=moves[0];
+  for (const [r,c] of moves) {
+    const {board:nb} = applyMove(board,r,c,WHITE);
+    const score = minimax(nb, 5, -Infinity, Infinity, false);
+    if (score > best) { best=score; bestMove=[r,c]; }
+  }
+  return bestMove;
+}
+
+// ── RENDER ──
+
+function renderBoard() {
+  const el = document.getElementById('board');
+  el.innerHTML='';
+  const legal = gameActive ? getLegal(board, currentTurn) : [];
+  const legalSet = new Set(legal.map(([r,c])=>`${r},${c}`));
+
+  for (let r=0;r<8;r++) for (let c=0;c<8;c++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    const key = `${r},${c}`;
+    if (board[r][c]===EMPTY) {
+      if (legalSet.has(key) && currentTurn===BLACK && gameActive && !aiThinking) {
+        cell.classList.add('hint');
+        cell.addEventListener('click', () => playerMove(r,c));
+      }
+    } else {
+      const piece = document.createElement('div');
+      piece.className = `piece ${board[r][c]===BLACK?'black':'white'}`;
+      cell.appendChild(piece);
+    }
+    el.appendChild(cell);
+  }
+
+  const cnt = countBoard(board);
+  document.getElementById('score-black').textContent = cnt.black;
+  document.getElementById('score-white').textContent = cnt.white;
+}
+
+function updateTurnLabel() {
+  const el = document.getElementById('turn-label');
+  if (!gameActive) { el.textContent='READY'; el.className='turn-indicator turn-none'; return; }
+  if (aiThinking) { el.textContent='AI THINKING...'; el.className='turn-indicator turn-ai'; return; }
+  if (currentTurn===BLACK) { el.textContent='YOUR TURN'; el.className='turn-indicator turn-you'; }
+  else { el.textContent='AI TURN'; el.className='turn-indicator turn-ai'; }
+}
+
+function addLog(type, msg) {
+  const list = document.getElementById('log-list');
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  const tag = type==='you'?'[YOU]':type==='ai'?'[AI]':type==='warn'?'[!!]':'[SYS]';
+  entry.innerHTML = `<span class="log-tag">${tag}</span><span>${msg}</span>`;
+  list.insertBefore(entry, list.firstChild);
+}
+
+const colLabels = ['A','B','C','D','E','F','G','H'];
+
+async function playerMove(r,c) {
+  if (!gameActive || currentTurn!==BLACK || aiThinking) return;
+  const flips = getFlips(board,r,c,BLACK);
+  if (flips.length===0) return;
+
+  const result = applyMove(board,r,c,BLACK);
+  board = result.board;
+  addLog('you', `${colLabels[c]}${r+1} に置きました (+${flips.length}枚)`);
+  renderBoard();
+
+  // Check game end
+  if (checkGameEnd()) return;
+
+  // AI turn
+  const aiMoves = getLegal(board, WHITE);
+  if (aiMoves.length===0) {
+    addLog('sys', 'AIはパスします');
+    currentTurn = BLACK;
+    updateTurnLabel();
+    renderBoard();
+    if (getLegal(board,BLACK).length===0) { endGame(); }
+    return;
+  }
+
+  currentTurn = WHITE;
+  aiThinking = true;
+  updateTurnLabel();
+  renderBoard();
+
+  await new Promise(r => setTimeout(r, aiLevel===3?900:600));
+
+  const move = aiMove();
+  if (move) {
+    const [ar,ac] = move;
+    const aiResult = applyMove(board,ar,ac,WHITE);
+    board = aiResult.board;
+    addLog('ai', `${colLabels[ac]}${ar+1} に置きました (+${aiResult.flips.length}枚)`);
+  }
+
+  aiThinking = false;
+  currentTurn = BLACK;
+
+  if (checkGameEnd()) return;
+
+  const playerMoves = getLegal(board, BLACK);
+  if (playerMoves.length===0) {
+    addLog('warn', 'あなたはパスします');
+    currentTurn = WHITE;
+    updateTurnLabel();
+    renderBoard();
+    setTimeout(() => { aiThinking=true; updateTurnLabel(); renderBoard();
+      setTimeout(() => {
+        const m=aiMove();
+        if(m){const[ar,ac]=m;const res=applyMove(board,ar,ac,WHITE);board=res.board;addLog('ai',`${colLabels[ac]}${ar+1} に置きました`);}
+        aiThinking=false; currentTurn=BLACK;
+        if(!checkGameEnd()){renderBoard();updateTurnLabel();}
+      }, 700);
+    }, 300);
+    return;
+  }
+
+  updateTurnLabel();
+  renderBoard();
+}
+
+function checkGameEnd() {
+  const bm = getLegal(board,BLACK);
+  const wm = getLegal(board,WHITE);
+  if (bm.length===0 && wm.length===0) { endGame(); return true; }
+  return false;
+}
+
+function endGame() {
+  gameActive = false;
+  const cnt = countBoard(board);
+  const overlay = document.getElementById('result-overlay');
+  const titleEl = document.getElementById('result-title');
+  const scoreEl = document.getElementById('result-score');
+
+  scoreEl.textContent = `BLACK ${cnt.black}  —  WHITE ${cnt.white}`;
+
+  if (cnt.black > cnt.white) {
+    titleEl.textContent = 'YOU WIN!';
+    titleEl.className = 'result-title result-win';
+    addLog('sys', `ゲーム終了 — あなたの勝利！ (${cnt.black} vs ${cnt.white})`);
+  } else if (cnt.white > cnt.black) {
+    titleEl.textContent = 'YOU LOSE';
+    titleEl.className = 'result-title result-lose';
+    addLog('sys', `ゲーム終了 — AIの勝利 (${cnt.black} vs ${cnt.white})`);
+  } else {
+    titleEl.textContent = 'DRAW';
+    titleEl.className = 'result-title result-draw';
+    addLog('sys', `ゲーム終了 — 引き分け (${cnt.black} vs ${cnt.white})`);
+  }
+
+  updateTurnLabel();
+  renderBoard();
+  setTimeout(() => overlay.classList.add('show'), 600);
+}
+
+function startGame() {
+  initBoard();
+  currentTurn = BLACK;
+  gameActive = true;
+  aiThinking = false;
+  document.getElementById('log-list').innerHTML = '';
+  addLog('sys', `ゲーム開始 — 難易度: ${['','EASY','NORMAL','HARD'][aiLevel]}`);
+  addLog('sys', 'あなたは黒、AIは白です');
+  document.getElementById('result-overlay').classList.remove('show');
+  updateTurnLabel();
+  renderBoard();
+}
+
+// ── EVENTS ──
+
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    aiLevel = parseInt(btn.dataset.level);
+  });
+});
+
+document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('result-close').addEventListener('click', startGame);
+
+// Init display
+initBoard();
+renderBoard();
+updateTurnLabel();
+</script>
+</body>
+</html>
