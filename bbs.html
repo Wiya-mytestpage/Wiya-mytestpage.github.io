@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS // BBS</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg:      #f0f2f5;
+    --surface: #ffffff;
+    --panel:   #e8ecf2;
+    --border:  #c8d0dc;
+    --deep:    #0a0e1a;
+    --accent:  #0057ff;
+    --cyan:    #00c8ff;
+    --red:     #ff2b4e;
+    --orange:  #ff6b00;
+    --green:   #39ff14;
+    --text:    #0a0e1a;
+    --muted:   #7a8a9e;
+    --mono:    'Share Tech Mono', monospace;
+    --sans:    'Rajdhani', sans-serif;
+    --jp:      'Noto Sans JP', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--jp);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L56 80 L56 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L0 80 L0 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3C/svg%3E");
+    opacity: .35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ══ HEADER ══ */
+  header {
+    position: relative;
+    z-index: 10;
+    background: var(--deep);
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scanline 4s linear infinite;
+    top: 0;
+  }
+
+  @keyframes scanline {
+    0%   { top: 0; opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: .15em;
+    transition: color .2s;
+  }
+  .back-btn:hover { color: var(--cyan); }
+
+  .header-divider { width: 1px; height: 24px; background: #333; }
+
+  .header-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--cyan);
+    letter-spacing: .25em;
+  }
+
+  .header-title {
+    font-family: var(--sans);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .1em;
+    margin-left: auto;
+  }
+
+  .header-title span { color: var(--cyan); font-weight: 300; }
+
+  /* ══ NAV ══ */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(240,242,245,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-logo {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--accent);
+    letter-spacing: .1em;
+    padding: 14px 24px 14px 0;
+    border-right: 1px solid var(--border);
+    margin-right: 8px;
+  }
+
+  nav a {
+    font-family: var(--sans);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 16px 18px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    position: relative;
+    transition: color .2s;
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 18px; right: 18px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform .2s;
+  }
+
+  nav a:hover { color: var(--accent); }
+  nav a:hover::after { transform: scaleX(1); }
+  nav a.active { color: var(--accent); }
+  nav a.active::after { transform: scaleX(1); }
+
+  /* ══ MAIN ══ */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .sec-num {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--accent);
+    background: rgba(0,87,255,.07);
+    border: 1px solid rgba(0,87,255,.2);
+    padding: 4px 10px;
+    letter-spacing: .1em;
+  }
+
+  .sec-title {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+
+  .sec-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ══ THREAD LIST ══ */
+  .thread-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .thread-tab {
+    font-family: var(--mono);
+    font-size: .6rem;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: .1em;
+    transition: all .15s;
+  }
+
+  .thread-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .thread-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* ══ POSTS ══ */
+  .posts-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+    min-height: 200px;
+  }
+
+  .post-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    animation: fadeUp .3s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .post-num {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--muted);
+    letter-spacing: .1em;
+  }
+
+  .post-name {
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: .05em;
+  }
+
+  .post-date {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .post-thread-tag {
+    font-family: var(--mono);
+    font-size: .5rem;
+    padding: 2px 8px;
+    background: rgba(0,87,255,.08);
+    color: var(--accent);
+    border: 1px solid rgba(0,87,255,.2);
+    letter-spacing: .08em;
+  }
+
+  .post-content {
+    font-size: .88rem;
+    line-height: 1.9;
+    color: #2a3444;
+    font-weight: 300;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .no-posts {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    padding: 40px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--muted);
+    letter-spacing: .15em;
+  }
+
+  .loading {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    padding: 40px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ══ FORM ══ */
+  .form-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+  }
+
+  .form-head {
+    background: var(--deep);
+    padding: 12px 20px;
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-head::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: blink 1.5s step-end infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .form-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .form-label {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: var(--muted);
+    letter-spacing: .15em;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    font-family: var(--jp);
+    font-size: .85rem;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+    font-weight: 300;
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+
+  .form-textarea { resize: vertical; min-height: 100px; }
+
+  .form-select { cursor: pointer; }
+
+  .submit-btn {
+    font-family: var(--sans);
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    padding: 13px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background .2s, transform .1s;
+    margin-top: 4px;
+  }
+
+  .submit-btn:hover { background: #003ecc; transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+
+  .form-msg {
+    font-family: var(--mono);
+    font-size: .6rem;
+    padding: 8px 12px;
+    letter-spacing: .08em;
+    display: none;
+  }
+
+  .form-msg.success { background: rgba(57,255,20,.08); color: #229922; border: 1px solid rgba(57,255,20,.3); display: block; }
+  .form-msg.error   { background: rgba(255,43,78,.08); color: var(--red); border: 1px solid rgba(255,43,78,.3); display: block; }
+
+  /* ══ SIDE ══ */
+  .side-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .panel-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+  }
+
+  .panel-box.dark {
+    background: var(--deep);
+    border-top-color: var(--cyan);
+  }
+
+  .panel-head {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(0,200,255,.12);
+  }
+
+  .panel-body { padding: 16px; }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: .6rem;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    color: var(--muted);
+  }
+
+  .panel-box.dark .stat-row { border-bottom-color: rgba(255,255,255,.05); }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-val { color: var(--cyan); }
+
+  .rule-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .rule-list li {
+    font-size: .78rem;
+    color: var(--muted);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--panel);
+    font-weight: 300;
+    line-height: 1.6;
+    display: flex;
+    gap: 8px;
+  }
+
+  .rule-list li:last-child { border-bottom: none; }
+  .rule-list li::before { content: '//'; font-family: var(--mono); font-size: .6rem; color: var(--accent); flex-shrink: 0; padding-top: 2px; }
+
+  /* ══ FOOTER ══ */
+  footer {
+    background: var(--deep);
+    border-top: 1px solid rgba(0,200,255,.15);
+    padding: 24px 32px;
+    position: relative; z-index: 1;
+  }
+
+  .footer-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .f-title { font-family: var(--sans); font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: .15em; }
+  .f-copy  { font-family: var(--mono); font-size: .55rem; color: var(--muted); }
+
+  @media (max-width: 700px) {
+    main { grid-template-columns: 1fr; padding: 24px 16px 60px; }
+    .side-panel { order: -1; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="back-btn" href="index.html">← BACK TO TOP</a>
+    <div class="header-divider"></div>
+    <div class="header-label">MODULE // 02 · BBS</div>
+    <div class="header-title">BBS <span>//</span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">NX</div>
+    <a href="index.html">TOP</a>
+    <a href="othello.html">GAMES</a>
+    <a href="#" class="active">BBS</a>
+    <a href="#">DIARY</a>
+    <a href="#">PROFILE</a>
+  </div>
+</nav>
+
+<main>
+  <!-- ══ 左：投稿一覧 + フォーム ══ -->
+  <div>
+    <div class="sec-head">
+      <span class="sec-num">BBS</span>
+      <span class="sec-title">掲示板</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <!-- スレッドタブ -->
+    <div class="thread-tabs">
+      <button class="thread-tab active" data-thread="all">ALL</button>
+      <button class="thread-tab" data-thread="雑談">雑談</button>
+      <button class="thread-tab" data-thread="ゲーム">ゲーム</button>
+      <button class="thread-tab" data-thread="アニメ">アニメ</button>
+      <button class="thread-tab" data-thread="その他">その他</button>
+    </div>
+
+    <!-- 投稿一覧 -->
+    <div class="posts-wrap" id="posts-wrap">
+      <div class="loading">// LOADING...</div>
+    </div>
+
+    <!-- 投稿フォーム -->
+    <div class="form-box">
+      <div class="form-head">// NEW POST — 書き込む</div>
+      <div class="form-body">
+        <div class="form-group">
+          <label class="form-label">NAME // 名前</label>
+          <input class="form-input" id="input-name" type="text" placeholder="名無しさん" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">THREAD // スレッド</label>
+          <select class="form-select" id="input-thread">
+            <option value="雑談">雑談</option>
+            <option value="ゲーム">ゲーム</option>
+            <option value="アニメ">アニメ</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">MESSAGE // 本文</label>
+          <textarea class="form-textarea" id="input-content" placeholder="書き込み内容を入力..." maxlength="500"></textarea>
+        </div>
+        <div class="form-msg" id="form-msg"></div>
+        <button class="submit-btn" id="submit-btn">▶ 書き込む</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 右：サイドパネル ══ -->
+  <div class="side-panel">
+
+    <div class="panel-box dark">
+      <div class="panel-head">// BBS STATUS</div>
+      <div class="panel-body">
+        <div class="stat-row">STATUS <span class="stat-val" style="color:#39ff14">● ONLINE</span></div>
+        <div class="stat-row">TOTAL POSTS <span class="stat-val" id="total-posts">--</span></div>
+        <div class="stat-row">TODAY <span class="stat-val" id="today-posts">--</span></div>
+        <div class="stat-row">THREADS <span class="stat-val">4</span></div>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-head">// RULES</div>
+      <div class="panel-body">
+        <ul class="rule-list">
+          <li>荒らし・誹謗中傷は禁止</li>
+          <li>個人情報を書かないこと</li>
+          <li>広告・スパム投稿は削除</li>
+          <li>楽しく使いましょう！</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-head">// THREADS</div>
+      <div class="panel-body">
+        <ul class="rule-list">
+          <li>雑談 — なんでもOK</li>
+          <li>ゲーム — ゲームの話題</li>
+          <li>アニメ — アニメの話題</li>
+          <li>その他 — 上記以外</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="f-title">NEXUS</div>
+    <div class="f-copy">&copy; 2025 NEXUS // BBS MODULE</div>
+  </div>
+</footer>
+
+<script>
+// ══════════════════════════════════
+//  Supabase 設定
+// ══════════════════════════════════
+const SUPABASE_URL = 'https://kxdoocyozsxfinpsefsm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4ZG9vY3lvenN4ZmlucHNlZnNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MTU3MjQsImV4cCI6MjA4ODI5MTcyNH0.lRrKQMwxa5VHxa4R4Y26QmkyZtm1qDB0-4ETYFZ79xY';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentThread = 'all';
+let allPosts = [];
+
+// ── 投稿を取得 ──
+async function fetchPosts() {
+  const wrap = document.getElementById('posts-wrap');
+  wrap.innerHTML = '<div class="loading">// LOADING...</div>';
+
+  const { data, error } = await db
+    .from('posts')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (error) {
+    wrap.innerHTML = '<div class="no-posts">// ERROR: データの取得に失敗しました</div>';
+    return;
+  }
+
+  allPosts = data || [];
+  updateStats();
+  renderPosts();
+}
+
+// ── 投稿を描画 ──
+function renderPosts() {
+  const wrap = document.getElementById('posts-wrap');
+  const filtered = currentThread === 'all'
+    ? allPosts
+    : allPosts.filter(p => p.thread === currentThread);
+
+  if (filtered.length === 0) {
+    wrap.innerHTML = '<div class="no-posts">// NO POSTS YET — 最初の書き込みをどうぞ！</div>';
+    return;
+  }
+
+  wrap.innerHTML = '';
+  filtered.forEach((post, i) => {
+    const card = document.createElement('div');
+    card.className = 'post-card';
+    card.style.animationDelay = `${i * 0.04}s`;
+
+    const date = new Date(post.created_at);
+    const dateStr = `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+
+    card.innerHTML = `
+      <div class="post-header">
+        <span class="post-num">No.${filtered.length - i}</span>
+        <span class="post-name">${escHtml(post.name || '名無しさん')}</span>
+        <span class="post-thread-tag">${escHtml(post.thread || 'その他')}</span>
+        <span class="post-date">${dateStr}</span>
+      </div>
+      <div class="post-content">${escHtml(post.content)}</div>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+// ── 統計を更新 ──
+function updateStats() {
+  document.getElementById('total-posts').textContent = allPosts.length;
+  const today = new Date().toDateString();
+  const todayCount = allPosts.filter(p => new Date(p.created_at).toDateString() === today).length;
+  document.getElementById('today-posts').textContent = todayCount;
+}
+
+// ── XSS対策 ──
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ── 投稿する ──
+async function submitPost() {
+  const name    = document.getElementById('input-name').value.trim() || '名無しさん';
+  const thread  = document.getElementById('input-thread').value;
+  const content = document.getElementById('input-content').value.trim();
+  const msgEl   = document.getElementById('form-msg');
+  const btn     = document.getElementById('submit-btn');
+
+  msgEl.className = 'form-msg';
+  msgEl.textContent = '';
+
+  if (!content) {
+    msgEl.className = 'form-msg error';
+    msgEl.textContent = '// ERROR: 本文を入力してください';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '// SENDING...';
+
+  const { error } = await db.from('posts').insert([{ name, thread, content }]);
+
+  if (error) {
+    msgEl.className = 'form-msg error';
+    msgEl.textContent = '// ERROR: 送信に失敗しました。もう一度お試しください。';
+    btn.disabled = false;
+    btn.textContent = '▶ 書き込む';
+    return;
+  }
+
+  msgEl.className = 'form-msg success';
+  msgEl.textContent = '// SUCCESS: 書き込みました！';
+  document.getElementById('input-content').value = '';
+  btn.disabled = false;
+  btn.textContent = '▶ 書き込む';
+
+  await fetchPosts();
+
+  setTimeout(() => {
+    msgEl.className = 'form-msg';
+    msgEl.textContent = '';
+  }, 3000);
+}
+
+// ── イベント ──
+document.getElementById('submit-btn').addEventListener('click', submitPost);
+
+document.getElementById('input-content').addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter') submitPost();
+});
+
+document.querySelectorAll('.thread-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.thread-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentThread = tab.dataset.thread;
+    renderPosts();
+  });
+});
+
+// ── リアルタイム更新 ──
+db.channel('posts-channel')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
+    allPosts.unshift(payload.new);
+    updateStats();
+    renderPosts();
+  })
+  .subscribe();
+
+// ── 初期読み込み ──
+fetchPosts();
+</script>
+</body>
+</html>
