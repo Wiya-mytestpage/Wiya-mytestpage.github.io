@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS // NOTE</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg:      #f0f2f5;
+    --surface: #ffffff;
+    --panel:   #e8ecf2;
+    --border:  #c8d0dc;
+    --deep:    #0a0e1a;
+    --accent:  #0057ff;
+    --cyan:    #00c8ff;
+    --red:     #ff2b4e;
+    --orange:  #ff6b00;
+    --green:   #39ff14;
+    --text:    #0a0e1a;
+    --muted:   #7a8a9e;
+    --mono:    'Share Tech Mono', monospace;
+    --sans:    'Rajdhani', sans-serif;
+    --jp:      'Noto Sans JP', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--jp);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L56 80 L56 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L0 80 L0 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3C/svg%3E");
+    opacity: .35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ══ HEADER ══ */
+  header {
+    position: relative;
+    z-index: 10;
+    background: var(--deep);
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scanline 4s linear infinite;
+    top: 0;
+  }
+
+  @keyframes scanline {
+    0%   { top: 0; opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: .15em;
+    transition: color .2s;
+  }
+  .back-btn:hover { color: var(--cyan); }
+
+  .header-divider { width: 1px; height: 24px; background: #333; }
+
+  .header-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--cyan);
+    letter-spacing: .25em;
+  }
+
+  .header-title {
+    font-family: var(--sans);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .1em;
+    margin-left: auto;
+  }
+
+  .header-title span { color: var(--cyan); font-weight: 300; }
+
+  /* ══ NAV ══ */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(240,242,245,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-logo {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--accent);
+    letter-spacing: .1em;
+    padding: 14px 24px 14px 0;
+    border-right: 1px solid var(--border);
+    margin-right: 8px;
+  }
+
+  nav a {
+    font-family: var(--sans);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 16px 18px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    position: relative;
+    transition: color .2s;
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 18px; right: 18px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform .2s;
+  }
+
+  nav a:hover { color: var(--accent); }
+  nav a:hover::after { transform: scaleX(1); }
+  nav a.active { color: var(--accent); }
+  nav a.active::after { transform: scaleX(1); }
+
+  /* ══ MAIN ══ */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .sec-num {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--accent);
+    background: rgba(0,87,255,.07);
+    border: 1px solid rgba(0,87,255,.2);
+    padding: 4px 10px;
+    letter-spacing: .1em;
+  }
+
+  .sec-title {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+
+  .sec-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ══ TAG FILTER ══ */
+  .tag-filter {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .tag-btn {
+    font-family: var(--mono);
+    font-size: .58rem;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: .1em;
+    transition: all .15s;
+    border-radius: 2px;
+  }
+
+  .tag-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .tag-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* ══ ARTICLE CARDS ══ */
+  .articles {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .article-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 24px 28px;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    animation: fadeUp .4s both;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+  }
+
+  .article-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,87,255,.1);
+    border-color: rgba(0,87,255,.4);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .article-date {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: var(--muted);
+    letter-spacing: .1em;
+  }
+
+  .article-tag {
+    font-family: var(--mono);
+    font-size: .5rem;
+    padding: 3px 8px;
+    background: rgba(0,87,255,.08);
+    color: var(--accent);
+    border: 1px solid rgba(0,87,255,.2);
+    letter-spacing: .08em;
+  }
+
+  .article-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .article-excerpt {
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.9;
+    font-weight: 300;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--panel);
+  }
+
+  .article-readmore {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: var(--accent);
+    letter-spacing: .1em;
+  }
+
+  .article-chars {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--muted);
+  }
+
+  /* ══ ARTICLE DETAIL ══ */
+  .article-detail { display: none; }
+  .article-detail.show { display: block; }
+  .articles-list.hide { display: none; }
+
+  .detail-back {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: .15em;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color .2s;
+    background: none;
+    border: none;
+  }
+
+  .detail-back:hover { color: var(--accent); }
+
+  .detail-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    padding: 40px;
+  }
+
+  .detail-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .detail-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  .detail-content {
+    font-size: .92rem;
+    line-height: 2.2;
+    color: #2a3444;
+    font-weight: 300;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* ══ NO ARTICLES ══ */
+  .no-articles {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    padding: 48px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--muted);
+    letter-spacing: .15em;
+    line-height: 2.5;
+  }
+
+  .loading {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    padding: 48px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ══ ADMIN PANEL ══ */
+  .admin-toggle {
+    font-family: var(--mono);
+    font-size: .58rem;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: .1em;
+    transition: all .15s;
+    margin-bottom: 16px;
+  }
+
+  .admin-toggle:hover { border-color: var(--orange); color: var(--orange); }
+  .admin-toggle.active { border-color: var(--orange); color: var(--orange); background: rgba(255,107,0,.06); }
+
+  .admin-login {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--orange);
+    padding: 20px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .admin-login.show { display: block; }
+
+  .admin-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--orange);
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .admin-form.show { display: block; }
+
+  .admin-head {
+    background: rgba(255,107,0,.06);
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--orange);
+    letter-spacing: .2em;
+    border-bottom: 1px solid rgba(255,107,0,.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .admin-logout {
+    font-family: var(--mono);
+    font-size: .5rem;
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    letter-spacing: .1em;
+    transition: color .15s;
+  }
+
+  .admin-logout:hover { color: var(--red); }
+
+  .admin-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .form-label {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: var(--muted);
+    letter-spacing: .15em;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    font-family: var(--jp);
+    font-size: .85rem;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+    font-weight: 300;
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus { border-color: var(--orange); background: var(--surface); }
+
+  .form-textarea { resize: vertical; min-height: 160px; }
+
+  .submit-btn {
+    font-family: var(--sans);
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    padding: 13px;
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background .2s, transform .1s;
+  }
+
+  .submit-btn:hover { background: #cc5500; transform: translateY(-1px); }
+  .submit-btn:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+
+  .pw-btn {
+    font-family: var(--sans);
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    padding: 11px;
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background .2s;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .pw-btn:hover { background: #cc5500; }
+
+  .form-msg {
+    font-family: var(--mono);
+    font-size: .6rem;
+    padding: 8px 12px;
+    letter-spacing: .08em;
+    display: none;
+  }
+
+  .form-msg.success { background: rgba(57,255,20,.08); color: #229922; border: 1px solid rgba(57,255,20,.3); display: block; }
+  .form-msg.error   { background: rgba(255,43,78,.08); color: var(--red); border: 1px solid rgba(255,43,78,.3); display: block; }
+
+  /* ══ SIDE ══ */
+  .side-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .panel-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+  }
+
+  .panel-box.dark {
+    background: var(--deep);
+    border-top-color: var(--cyan);
+  }
+
+  .panel-head {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(0,200,255,.12);
+  }
+
+  .panel-body { padding: 16px; }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: .6rem;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    color: var(--muted);
+  }
+
+  .panel-box:not(.dark) .stat-row { border-bottom-color: var(--panel); }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-val { color: var(--cyan); }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag-cloud-item {
+    font-family: var(--mono);
+    font-size: .55rem;
+    padding: 4px 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: .08em;
+    transition: all .15s;
+  }
+
+  .tag-cloud-item:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ══ FOOTER ══ */
+  footer {
+    background: var(--deep);
+    border-top: 1px solid rgba(0,200,255,.15);
+    padding: 24px 32px;
+    position: relative; z-index: 1;
+  }
+
+  .footer-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .f-title { font-family: var(--sans); font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: .15em; }
+  .f-copy  { font-family: var(--mono); font-size: .55rem; color: var(--muted); }
+
+  @media (max-width: 700px) {
+    main { grid-template-columns: 1fr; padding: 24px 16px 60px; }
+    .side-panel { order: -1; }
+    .detail-box { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="back-btn" href="index.html">← BACK TO TOP</a>
+    <div class="header-divider"></div>
+    <div class="header-label">MODULE // 03 · NOTE</div>
+    <div class="header-title">NOTE <span>//</span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">NX</div>
+    <a href="index.html">TOP</a>
+    <a href="othello.html">GAMES</a>
+    <a href="bbs.html">BBS</a>
+    <a href="#">DIARY</a>
+    <a href="#" class="active">NOTE</a>
+  </div>
+</nav>
+
+<main>
+  <!-- ══ 左：記事一覧 ══ -->
+  <div>
+    <div class="sec-head">
+      <span class="sec-num">NOTE</span>
+      <span class="sec-title">記事一覧</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <!-- 管理者トグル -->
+    <button class="admin-toggle" id="admin-toggle">⚙ ADMIN MODE</button>
+
+    <!-- パスワード入力 -->
+    <div class="admin-login" id="admin-login">
+      <div class="admin-head">// ADMIN LOGIN</div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <div class="form-group">
+          <label class="form-label">PASSWORD</label>
+          <input class="form-input" type="password" id="pw-input" placeholder="パスワードを入力">
+        </div>
+        <div class="form-msg" id="pw-msg"></div>
+        <button class="pw-btn" id="pw-btn">▶ LOGIN</button>
+      </div>
+    </div>
+
+    <!-- 投稿フォーム（ログイン後に表示） -->
+    <div class="admin-form" id="admin-form">
+      <div class="admin-head">
+        <span>// NEW ARTICLE</span>
+        <button class="admin-logout" id="admin-logout">LOGOUT</button>
+      </div>
+      <div class="admin-body">
+        <div class="form-group">
+          <label class="form-label">TITLE // タイトル</label>
+          <input class="form-input" id="input-title" type="text" placeholder="記事のタイトル" maxlength="100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">TAG // タグ</label>
+          <select class="form-select" id="input-tag">
+            <option value="Blender">Blender</option>
+            <option value="MMD">MMD</option>
+            <option value="Unity">Unity</option>
+            <option value="UE5">UE5</option>
+            <option value="ゲーム">ゲーム</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CONTENT // 本文</label>
+          <textarea class="form-textarea" id="input-content" placeholder="記事の内容を書いてください..."></textarea>
+        </div>
+        <div class="form-msg" id="form-msg"></div>
+        <button class="submit-btn" id="submit-btn">▶ 投稿する</button>
+      </div>
+    </div>
+
+    <!-- タグフィルター -->
+    <div class="tag-filter" id="tag-filter">
+      <button class="tag-btn active" data-tag="all">ALL</button>
+      <button class="tag-btn" data-tag="Blender">Blender</button>
+      <button class="tag-btn" data-tag="MMD">MMD</button>
+      <button class="tag-btn" data-tag="Unity">Unity</button>
+      <button class="tag-btn" data-tag="UE5">UE5</button>
+      <button class="tag-btn" data-tag="ゲーム">ゲーム</button>
+      <button class="tag-btn" data-tag="その他">その他</button>
+    </div>
+
+    <!-- 記事一覧 -->
+    <div id="articles-list">
+      <div class="loading">// LOADING...</div>
+    </div>
+
+    <!-- 記事詳細 -->
+    <div class="article-detail" id="article-detail">
+      <button class="detail-back" id="detail-back">← 一覧に戻る</button>
+      <div class="detail-box">
+        <div class="detail-meta">
+          <span class="article-date" id="detail-date"></span>
+          <span class="article-tag" id="detail-tag"></span>
+        </div>
+        <div class="detail-title" id="detail-title"></div>
+        <div class="detail-content" id="detail-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 右：サイドパネル ══ -->
+  <div class="side-panel">
+
+    <div class="panel-box dark">
+      <div class="panel-head">// NOTE STATUS</div>
+      <div class="panel-body">
+        <div class="stat-row">TOTAL <span class="stat-val" id="total-articles">--</span></div>
+        <div class="stat-row">LATEST <span class="stat-val" id="latest-date">--</span></div>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-head">// TAGS</div>
+      <div class="panel-body">
+        <div class="tag-cloud" id="tag-cloud">
+          <span class="tag-cloud-item" data-tag="Blender">Blender</span>
+          <span class="tag-cloud-item" data-tag="MMD">MMD</span>
+          <span class="tag-cloud-item" data-tag="Unity">Unity</span>
+          <span class="tag-cloud-item" data-tag="UE5">UE5</span>
+          <span class="tag-cloud-item" data-tag="ゲーム">ゲーム</span>
+          <span class="tag-cloud-item" data-tag="その他">その他</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-head">// ABOUT NOTE</div>
+      <div class="panel-body" style="font-size:.78rem;color:var(--muted);line-height:2;font-weight:300;">
+        Blender・MMD・Unity・UE5などの3DCG・ゲーム開発について書いています。気になる記事があればぜひ読んでみてください。
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="f-title">NEXUS</div>
+    <div class="f-copy">&copy; 2025 NEXUS // NOTE MODULE</div>
+  </div>
+</footer>
+
+<script>
+// ══════════════════════════════════
+//  Supabase 設定
+// ══════════════════════════════════
+const SUPABASE_URL = 'https://kxdoocyozsxfinpsefsm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4ZG9vY3lvenN4ZmlucHNlZnNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MTU3MjQsImV4cCI6MjA4ODI5MTcyNH0.lRrKQMwxa5VHxa4R4Y26QmkyZtm1qDB0-4ETYFZ79xY';
+const ADMIN_PASSWORD = 'wiya-admin';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allArticles = [];
+let currentTag = 'all';
+let isAdmin = false;
+
+// ── XSS対策 ──
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ── 記事を取得 ──
+async function fetchArticles() {
+  const list = document.getElementById('articles-list');
+  list.innerHTML = '<div class="loading">// LOADING...</div>';
+
+  const { data, error } = await db
+    .from('notes')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    list.innerHTML = '<div class="no-articles">// ERROR: データの取得に失敗しました</div>';
+    return;
+  }
+
+  allArticles = data || [];
+  updateStats();
+  renderArticles();
+}
+
+// ── 統計更新 ──
+function updateStats() {
+  document.getElementById('total-articles').textContent = allArticles.length + ' 件';
+  if (allArticles.length > 0) {
+    const d = new Date(allArticles[0].created_at);
+    document.getElementById('latest-date').textContent =
+      `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  } else {
+    document.getElementById('latest-date').textContent = '--';
+  }
+}
+
+// ── 記事一覧を描画 ──
+function renderArticles() {
+  const list = document.getElementById('articles-list');
+  const filtered = currentTag === 'all'
+    ? allArticles
+    : allArticles.filter(a => a.tag === currentTag);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="no-articles">// NO ARTICLES YET<br><br>${currentTag !== 'all' ? 'このタグの記事はまだありません' : '最初の記事を投稿してみましょう！'}</div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'articles';
+
+  filtered.forEach((article, i) => {
+    const d = new Date(article.created_at);
+    const dateStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    const excerpt = article.content.length > 120 ? article.content.slice(0, 120) + '...' : article.content;
+
+    const card = document.createElement('div');
+    card.className = 'article-card';
+    card.style.animationDelay = `${i * 0.05}s`;
+    card.innerHTML = `
+      <div class="article-meta">
+        <span class="article-date">${dateStr}</span>
+        <span class="article-tag">${esc(article.tag || 'その他')}</span>
+      </div>
+      <div class="article-title">${esc(article.title)}</div>
+      <div class="article-excerpt">${esc(excerpt)}</div>
+      <div class="article-footer">
+        <span class="article-readmore">→ READ MORE</span>
+        <span class="article-chars">${article.content.length} 文字</span>
+      </div>
+    `;
+    card.addEventListener('click', () => showDetail(article));
+    wrap.appendChild(card);
+  });
+
+  list.appendChild(wrap);
+}
+
+// ── 記事詳細表示 ──
+function showDetail(article) {
+  const d = new Date(article.created_at);
+  const dateStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+
+  document.getElementById('detail-date').textContent = dateStr;
+  document.getElementById('detail-tag').textContent = article.tag || 'その他';
+  document.getElementById('detail-title').textContent = article.title;
+  document.getElementById('detail-content').textContent = article.content;
+
+  document.getElementById('articles-list').style.display = 'none';
+  document.getElementById('tag-filter').style.display = 'none';
+  document.getElementById('article-detail').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── 一覧に戻る ──
+function showList() {
+  document.getElementById('articles-list').style.display = 'block';
+  document.getElementById('tag-filter').style.display = 'flex';
+  document.getElementById('article-detail').classList.remove('show');
+}
+
+// ── 投稿する ──
+async function submitArticle() {
+  const title   = document.getElementById('input-title').value.trim();
+  const tag     = document.getElementById('input-tag').value;
+  const content = document.getElementById('input-content').value.trim();
+  const msgEl   = document.getElementById('form-msg');
+  const btn     = document.getElementById('submit-btn');
+
+  msgEl.className = 'form-msg';
+  if (!title) { msgEl.className = 'form-msg error'; msgEl.textContent = '// ERROR: タイトルを入力してください'; return; }
+  if (!content) { msgEl.className = 'form-msg error'; msgEl.textContent = '// ERROR: 本文を入力してください'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '// POSTING...';
+
+  const { error } = await db.from('notes').insert([{ title, tag, content }]);
+
+  if (error) {
+    msgEl.className = 'form-msg error';
+    msgEl.textContent = '// ERROR: 投稿に失敗しました。Supabaseのnotesテーブルを確認してください。';
+    btn.disabled = false;
+    btn.textContent = '▶ 投稿する';
+    return;
+  }
+
+  msgEl.className = 'form-msg success';
+  msgEl.textContent = '// SUCCESS: 投稿しました！';
+  document.getElementById('input-title').value = '';
+  document.getElementById('input-content').value = '';
+  btn.disabled = false;
+  btn.textContent = '▶ 投稿する';
+  await fetchArticles();
+
+  setTimeout(() => { msgEl.className = 'form-msg'; }, 3000);
+}
+
+// ── 管理者ログイン ──
+function adminLogin() {
+  const pw = document.getElementById('pw-input').value;
+  const msgEl = document.getElementById('pw-msg');
+  if (pw === ADMIN_PASSWORD) {
+    isAdmin = true;
+    document.getElementById('admin-login').classList.remove('show');
+    document.getElementById('admin-form').classList.add('show');
+    document.getElementById('admin-toggle').classList.add('active');
+    document.getElementById('admin-toggle').textContent = '⚙ ADMIN MODE — ON';
+    msgEl.className = 'form-msg';
+  } else {
+    msgEl.className = 'form-msg error';
+    msgEl.textContent = '// ERROR: パスワードが違います';
+  }
+}
+
+// ── イベント ──
+document.getElementById('admin-toggle').addEventListener('click', () => {
+  if (isAdmin) return;
+  const login = document.getElementById('admin-login');
+  login.classList.toggle('show');
+});
+
+document.getElementById('pw-btn').addEventListener('click', adminLogin);
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
+
+document.getElementById('admin-logout').addEventListener('click', () => {
+  isAdmin = false;
+  document.getElementById('admin-form').classList.remove('show');
+  document.getElementById('admin-toggle').classList.remove('active');
+  document.getElementById('admin-toggle').textContent = '⚙ ADMIN MODE';
+  document.getElementById('pw-input').value = '';
+});
+
+document.getElementById('submit-btn').addEventListener('click', submitArticle);
+document.getElementById('detail-back').addEventListener('click', showList);
+
+document.querySelectorAll('.tag-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTag = btn.dataset.tag;
+    renderArticles();
+  });
+});
+
+document.querySelectorAll('.tag-cloud-item').forEach(item => {
+  item.addEventListener('click', () => {
+    currentTag = item.dataset.tag;
+    document.querySelectorAll('.tag-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.tag === currentTag);
+    });
+    renderArticles();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// ── 初期読み込み ──
+fetchArticles();
+</script>
+</body>
+</html>
