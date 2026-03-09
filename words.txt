@@ -116,7 +116,7 @@ L,lawliet
 竈門炭治郎,kamadotanjirou
 竈門禰豆子,kamadonezuko
 我妻善逸,agatsumazenitsu
-嘴平伊之助,hashibira inosuke
+嘴平伊之助,hashibirainosuke
 冨岡義勇,tomiokagiyuu
 胡蝶しのぶ,kochoushinobu
 宇髄天元,uzuitengen
@@ -130,7 +130,7 @@ L,lawliet
 石田雨竜,ishidauuryuu
 井上織姫,inoueorihime
 日番谷冬獅郎,hitsugayatoushirou
-更木剣八,zaraki kenpachi
+更木剣八,zarakikenpachi
 草鹿やちる,kusajishiyachiru
 浦原喜助,uraharakeisuke
 平子真子,hirakoshinji
@@ -157,7 +157,7 @@ L,lawliet
 ヨル・フォージャー,yorforger
 ロイド・フォージャー,loidforger
 アーニャ・フォージャー,anyaforger
-ダミアン・デズモンド,damian desmond
+ダミアン・デズモンド,damiandesmond
 ベッキー・ブラックベル,beckyblackbell
 ボンド・フォージャー,bondforger
 デンジ,denji
@@ -192,7 +192,7 @@ L,lawliet
 岸谷新羅,kishitanishinra
 紀田正臣,kidamasaomi
 園原杏里,sonoharaanri
-折原臨也,oriharai zaya
+折原臨也,oriharaizaya
 平和島静雄,heiwajimashizuo
 門田京平,kadotakyouhei
 三ヶ島沙樹,mikajimasaki
@@ -231,7 +231,7 @@ L,lawliet
 獅子王凱,shishiougaai
 天海護,amamikamoru
 卯都木命,utsugimikoto
-藤原佐為,fujisawano sai
+藤原佐為,fujisawanosai
 進藤ヒカル,shindouhikaru
 塔矢アキラ,touyaakira
 犬夜叉,inuyasha
