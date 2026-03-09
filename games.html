@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS // GAMES</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #f0f2f5;
+    --surface: #ffffff;
+    --panel:   #e8ecf2;
+    --border:  #c8d0dc;
+    --deep:    #0a0e1a;
+    --accent:  #0057ff;
+    --cyan:    #00c8ff;
+    --red:     #ff2b4e;
+    --orange:  #ff6b00;
+    --text:    #0a0e1a;
+    --muted:   #7a8a9e;
+    --mono:    'Share Tech Mono', monospace;
+    --sans:    'Rajdhani', sans-serif;
+    --jp:      'Noto Sans JP', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--jp);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L56 80 L56 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L0 80 L0 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3C/svg%3E");
+    opacity: .35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ══ HEADER ══ */
+  header {
+    position: relative;
+    z-index: 10;
+    background: var(--deep);
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scanline 4s linear infinite;
+    top: 0;
+  }
+
+  @keyframes scanline {
+    0%   { top: 0; opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: .15em;
+    transition: color .2s;
+  }
+  .back-btn:hover { color: var(--cyan); }
+
+  .header-divider { width: 1px; height: 24px; background: #333; }
+
+  .header-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--cyan);
+    letter-spacing: .25em;
+  }
+
+  .header-title {
+    font-family: var(--sans);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .1em;
+    margin-left: auto;
+  }
+
+  .header-title span { color: var(--cyan); font-weight: 300; }
+
+  /* ══ NAV ══ */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(240,242,245,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-logo {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--accent);
+    letter-spacing: .1em;
+    padding: 14px 24px 14px 0;
+    border-right: 1px solid var(--border);
+    margin-right: 8px;
+  }
+
+  nav a {
+    font-family: var(--sans);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 16px 18px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    position: relative;
+    transition: color .2s;
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 18px; right: 18px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform .2s;
+  }
+
+  nav a:hover { color: var(--accent); }
+  nav a:hover::after { transform: scaleX(1); }
+  nav a.active { color: var(--accent); }
+  nav a.active::after { transform: scaleX(1); }
+
+  /* ══ MAIN ══ */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 48px 32px 100px;
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .sec-num {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--accent);
+    background: rgba(0,87,255,.07);
+    border: 1px solid rgba(0,87,255,.2);
+    padding: 4px 10px;
+    letter-spacing: .1em;
+  }
+
+  .sec-title {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+
+  .sec-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ══ GAME CARDS ══ */
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .game-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    animation: fadeUp .5s both;
+  }
+
+  .game-card:nth-child(1) { animation-delay: .05s; }
+  .game-card:nth-child(2) { animation-delay: .15s; }
+  .game-card:nth-child(3) { animation-delay: .25s; }
+
+  .game-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .3s;
+  }
+
+  .game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 48px rgba(0,87,255,.14);
+    border-color: rgba(0,87,255,.3);
+  }
+
+  .game-card:hover::before { transform: scaleX(1); }
+
+  /* カードのプレビューエリア */
+  .card-preview {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preview-othello {
+    background: linear-gradient(135deg, #0a1628 0%, #0d2040 100%);
+  }
+
+  .preview-shooting {
+    background: linear-gradient(135deg, #080818 0%, #1a0830 100%);
+  }
+
+  .preview-coming {
+    background: linear-gradient(135deg, #0f1420 0%, #1a2030 100%);
+  }
+
+  /* オセロプレビュー（CSS描画） */
+  .othello-board {
+    display: grid;
+    grid-template-columns: repeat(6, 18px);
+    grid-template-rows: repeat(6, 18px);
+    gap: 2px;
+    opacity: .85;
+  }
+
+  .ob-cell {
+    width: 18px; height: 18px;
+    background: #0a2a18;
+    border: 1px solid #1a4a28;
+    border-radius: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ob-black { width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #3a4a7a, #0d1428); border: 1px solid #4488ff; box-shadow: 0 0 4px rgba(68,136,255,.5); }
+  .ob-white { width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #c8d4e8); border: 1px solid #aabbcc; }
+
+  /* シューティングプレビュー（CSS星・弾） */
+  .shooting-preview-inner {
+    position: relative;
+    width: 120px;
+    height: 120px;
+  }
+
+  .s-star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #aabbdd;
+    border-radius: 50%;
+  }
+
+  .s-bullet {
+    position: absolute;
+    border-radius: 50%;
+    animation: bulletFloat 2s ease-in-out infinite;
+  }
+
+  @keyframes bulletFloat {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-8px); opacity: .7; }
+  }
+
+  .s-player {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 14px solid #ff4444;
+    filter: drop-shadow(0 0 4px rgba(255,68,68,.8));
+  }
+
+  .coming-icon {
+    font-size: 2.5rem;
+    opacity: .3;
+  }
+
+  /* カード下部 */
+  .card-body {
+    padding: 20px 24px 24px;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card-num {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--muted);
+    letter-spacing: .15em;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: .48rem;
+    padding: 3px 8px;
+    letter-spacing: .1em;
+  }
+
+  .badge-new { background: rgba(0,87,255,.1); color: var(--accent); border: 1px solid rgba(0,87,255,.3); }
+  .badge-wip { background: rgba(255,107,0,.1); color: var(--orange); border: 1px solid rgba(255,107,0,.3); }
+
+  .card-title {
+    font-family: var(--sans);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: .8rem;
+    color: var(--muted);
+    line-height: 1.9;
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: .5rem;
+    padding: 3px 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: .08em;
+  }
+
+  .card-enter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--panel);
+  }
+
+  .enter-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--accent);
+    letter-spacing: .12em;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity .2s, transform .2s;
+  }
+
+  .game-card:hover .enter-label { opacity: 1; transform: translateX(0); }
+
+  .enter-keys {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--muted);
+  }
+
+  /* ══ INFO PANEL ══ */
+  .info-box {
+    background: var(--deep);
+    border: 1px solid rgba(0,200,255,.15);
+    padding: 20px 28px;
+    margin-top: 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .info-box-label {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    white-space: nowrap;
+  }
+
+  .info-box-text {
+    font-size: .8rem;
+    color: #8899bb;
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* ══ FOOTER ══ */
+  footer {
+    background: var(--deep);
+    border-top: 1px solid rgba(0,200,255,.15);
+    padding: 24px 32px;
+    position: relative; z-index: 1;
+  }
+
+  .footer-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .f-title { font-family: var(--sans); font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: .15em; }
+  .f-copy  { font-family: var(--mono); font-size: .55rem; color: var(--muted); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 32px 16px 60px; }
+    .game-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="back-btn" href="index.html">← BACK TO TOP</a>
+    <div class="header-divider"></div>
+    <div class="header-label">MODULE // 01 · GAMES</div>
+    <div class="header-title">GAMES <span>//</span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">NX</div>
+    <a href="index.html">TOP</a>
+    <a href="games.html" class="active">GAMES</a>
+    <a href="bbs.html">BBS</a>
+    <a href="#">DIARY</a>
+    <a href="note.html">NOTE</a>
+  </div>
+</nav>
+
+<main>
+  <div class="sec-head">
+    <span class="sec-num">MODULE // 01</span>
+    <span class="sec-title">GAME SELECT</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="game-grid">
+
+    <!-- オセロ -->
+    <a class="game-card" href="othello.html">
+      <div class="card-preview preview-othello">
+        <div class="othello-board">
+          <!-- 6x6のミニボード -->
+          <div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div>
+          <div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div>
+          <div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"><div class="ob-white"></div></div><div class="ob-cell"><div class="ob-black"></div></div><div class="ob-cell"></div><div class="ob-cell"></div>
+          <div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"><div class="ob-black"></div></div><div class="ob-cell"><div class="ob-white"></div></div><div class="ob-cell"></div><div class="ob-cell"></div>
+          <div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div>
+          <div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div><div class="ob-cell"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">GAME // 01</span>
+          <span class="badge badge-new">PLAYABLE</span>
+        </div>
+        <div class="card-title">OTHELLO</div>
+        <div class="card-desc">AIとオセロで対戦できます。難易度はEASY・NORMAL・HARDの3段階。</div>
+        <div class="card-tags">
+          <span class="tag">1PLAYER</span>
+          <span class="tag">VS AI</span>
+          <span class="tag">ボードゲーム</span>
+        </div>
+        <div class="card-enter">
+          <span class="enter-label">→ PLAY NOW</span>
+          <span class="enter-keys">マウスで操作</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- シューティング -->
+    <a class="game-card" href="shooting/index.html">
+      <div class="card-preview preview-shooting">
+        <div class="shooting-preview-inner">
+          <!-- 星 -->
+          <div class="s-star" style="top:10%;left:20%"></div>
+          <div class="s-star" style="top:25%;left:70%"></div>
+          <div class="s-star" style="top:50%;left:15%"></div>
+          <div class="s-star" style="top:15%;left:85%"></div>
+          <div class="s-star" style="top:70%;left:60%"></div>
+          <div class="s-star" style="top:40%;left:45%"></div>
+          <!-- 弾 -->
+          <div class="s-bullet" style="width:8px;height:8px;background:#cc44ff;box-shadow:0 0 6px #cc44ff;top:20%;left:30%;animation-delay:.2s"></div>
+          <div class="s-bullet" style="width:6px;height:6px;background:#4488ff;box-shadow:0 0 6px #4488ff;top:35%;left:65%;animation-delay:.6s"></div>
+          <div class="s-bullet" style="width:7px;height:7px;background:#ff4444;box-shadow:0 0 6px #ff4444;top:25%;left:55%;animation-delay:.9s"></div>
+          <div class="s-bullet" style="width:5px;height:5px;background:#ffdd44;box-shadow:0 0 5px #ffdd44;top:45%;left:25%;animation-delay:.3s"></div>
+          <div class="s-bullet" style="width:6px;height:6px;background:#44ddff;box-shadow:0 0 6px #44ddff;top:30%;left:78%;animation-delay:.7s"></div>
+          <!-- プレイヤー -->
+          <div class="s-player"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">GAME // 02</span>
+          <span class="badge badge-new">PLAYABLE</span>
+        </div>
+        <div class="card-title">超幻想弾</div>
+        <div class="card-desc">東方風の弾幕シューティング。ボスを撃破せよ！6フェーズ・スペルカードあり。</div>
+        <div class="card-tags">
+          <span class="tag">1PLAYER</span>
+          <span class="tag">弾幕STG</span>
+          <span class="tag">スペルカード</span>
+        </div>
+        <div class="card-enter">
+          <span class="enter-label">→ PLAY NOW</span>
+          <span class="enter-keys">キーボードで操作</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 準備中 -->
+    <div class="game-card" style="cursor:default;opacity:.6;">
+      <div class="card-preview preview-coming">
+        <div class="coming-icon">🎮</div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="card-num">GAME // 03</span>
+          <span class="badge badge-wip">COMING SOON</span>
+        </div>
+        <div class="card-title">???</div>
+        <div class="card-desc">次のゲームを準備中です。お楽しみに！</div>
+        <div class="card-tags">
+          <span class="tag">準備中</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 操作説明 -->
+  <div class="info-box">
+    <span class="info-box-label">// 超幻想弾 操作方法</span>
+    <span class="info-box-text">
+      <strong style="color:#ccd6f0">↑↓←→</strong> 移動　
+      <strong style="color:#ccd6f0">Z</strong> ショット　
+      <strong style="color:#ccd6f0">X</strong> ボム（弾消し）　
+      <strong style="color:#ccd6f0">Shift</strong> 低速移動・ヒットボックス表示
+    </span>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="f-title">NEXUS</div>
+    <div class="f-copy">&copy; 2025 NEXUS // GAMES MODULE</div>
+  </div>
+</footer>
+
+</body>
+</html>
