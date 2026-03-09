@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS // TYPING</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #f0f2f5;
+    --surface: #ffffff;
+    --panel:   #e8ecf2;
+    --border:  #c8d0dc;
+    --deep:    #0a0e1a;
+    --accent:  #0057ff;
+    --cyan:    #00c8ff;
+    --red:     #ff2b4e;
+    --green:   #39ff14;
+    --orange:  #ff6b00;
+    --text:    #0a0e1a;
+    --muted:   #7a8a9e;
+    --mono:    'Share Tech Mono', monospace;
+    --sans:    'Rajdhani', sans-serif;
+    --jp:      'Noto Sans JP', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--jp);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L56 80 L56 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3Cpath d='M28 64 L0 80 L0 100' fill='none' stroke='%23c8d0dc' stroke-width='0.8'/%3E%3C/svg%3E");
+    opacity: .35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative; z-index: 10;
+    background: var(--deep);
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scanline 4s linear infinite;
+    top: 0;
+  }
+
+  @keyframes scanline {
+    0%   { top: 0; opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 22px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: .15em;
+    transition: color .2s;
+  }
+  .back-btn:hover { color: var(--cyan); }
+
+  .header-divider { width: 1px; height: 24px; background: #333; }
+  .header-label { font-family: var(--mono); font-size: .6rem; color: var(--cyan); letter-spacing: .25em; }
+
+  .header-title {
+    font-family: var(--sans);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .1em;
+    margin-left: auto;
+  }
+  .header-title span { color: var(--cyan); font-weight: 300; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(240,242,245,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-logo {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--accent);
+    letter-spacing: .1em;
+    padding: 14px 24px 14px 0;
+    border-right: 1px solid var(--border);
+    margin-right: 8px;
+  }
+
+  nav a {
+    font-family: var(--sans);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 16px 18px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    position: relative;
+    transition: color .2s;
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 18px; right: 18px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform .2s;
+  }
+
+  nav a:hover { color: var(--accent); }
+  nav a:hover::after { transform: scaleX(1); }
+  nav a.active { color: var(--accent); }
+  nav a.active::after { transform: scaleX(1); }
+
+  main {
+    position: relative; z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+  }
+
+  .screen { display: none; }
+  .screen.show { display: block; animation: fadeUp .35s both; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .sec-num {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--accent);
+    background: rgba(0,87,255,.07);
+    border: 1px solid rgba(0,87,255,.2);
+    padding: 4px 10px;
+    letter-spacing: .1em;
+  }
+
+  .sec-title {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+
+  .sec-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  /* ── タイトル画面 ── */
+  .title-hero {
+    background: var(--deep);
+    border: 1px solid rgba(0,200,255,.15);
+    padding: 56px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .title-hero::before {
+    content: 'TYPING';
+    position: absolute;
+    font-family: var(--sans);
+    font-size: 10rem;
+    font-weight: 700;
+    color: rgba(0,200,255,.04);
+    letter-spacing: .2em;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .title-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--cyan);
+    letter-spacing: .3em;
+    margin-bottom: 16px;
+  }
+
+  .title-name {
+    font-family: var(--sans);
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .1em;
+    margin-bottom: 8px;
+  }
+
+  .title-name span { color: var(--cyan); }
+
+  .title-sub {
+    font-size: .85rem;
+    color: #6a7a8e;
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 480px;
+    margin: 0 auto 28px;
+  }
+
+  .diff-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 24px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .diff-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+
+  .normal-btn::before { background: linear-gradient(135deg, rgba(0,87,255,.15), transparent); }
+  .hard-btn::before   { background: linear-gradient(135deg, rgba(255,43,78,.15), transparent); }
+
+  .diff-btn:hover { transform: translateY(-2px); }
+  .normal-btn:hover { border-color: var(--accent); }
+  .hard-btn:hover   { border-color: var(--red); }
+  .diff-btn:hover::before { opacity: 1; }
+
+  .diff-label {
+    font-family: var(--mono);
+    font-size: .55rem;
+    letter-spacing: .2em;
+    margin-bottom: 8px;
+  }
+
+  .normal-btn .diff-label { color: var(--cyan); }
+  .hard-btn .diff-label   { color: var(--red); }
+
+  .diff-name {
+    font-family: var(--sans);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .1em;
+    margin-bottom: 6px;
+  }
+
+  .diff-desc {
+    font-size: .72rem;
+    color: #6a7a8e;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .title-note {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: #4a5a6e;
+    letter-spacing: .1em;
+    line-height: 2;
+  }
+
+  /* ── ゲーム画面 ── */
+  .status-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 12px 16px;
+  }
+
+  .stat-box.danger { border-top-color: var(--red); }
+  .stat-box.good   { border-top-color: var(--green); }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: .52rem;
+    color: var(--muted);
+    letter-spacing: .15em;
+    margin-bottom: 4px;
+  }
+
+  .stat-val {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .stat-val.accent { color: var(--accent); }
+  .stat-val.danger { color: var(--red); }
+  .stat-val.good   { color: var(--green); }
+
+  .timer-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    height: 6px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    transition: width .1s linear;
+  }
+
+  .timer-bar.danger { background: linear-gradient(90deg, var(--red), #ff6b6b); }
+
+  .game-area {
+    background: var(--deep);
+    border: 1px solid rgba(0,200,255,.15);
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .game-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,87,255,.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .difficulty-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-family: var(--mono);
+    font-size: .52rem;
+    letter-spacing: .15em;
+    padding: 4px 10px;
+    border: 1px solid;
+  }
+
+  .difficulty-badge.normal { color: var(--cyan); border-color: rgba(0,200,255,.3); background: rgba(0,200,255,.06); }
+  .difficulty-badge.hard   { color: var(--red);  border-color: rgba(255,43,78,.3);  background: rgba(255,43,78,.06); }
+
+  .char-display {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .05em;
+    line-height: 1.3;
+    text-shadow: 0 0 20px rgba(0,200,255,.3);
+    position: relative; z-index: 1;
+  }
+
+  .romaji-display {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative; z-index: 1;
+  }
+
+  .romaji-char {
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    padding: 6px 7px;
+    border-bottom: 2px solid transparent;
+    transition: all .1s;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .romaji-char.done    { color: var(--cyan);  border-bottom-color: var(--cyan); }
+  .romaji-char.current { color: #fff; border-bottom-color: var(--accent); animation: cursorBlink .7s ease-in-out infinite; }
+  .romaji-char.pending { color: #2a3a5a; border-bottom-color: #1a2a3a; }
+  .romaji-char.wrong   { color: var(--red); border-bottom-color: var(--red); animation: shake .2s ease; }
+
+  @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+  .miss-flash {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,43,78,.08);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .1s;
+    z-index: 0;
+  }
+
+  .miss-flash.show { opacity: 1; }
+
+  .next-preview {
+    font-family: var(--mono);
+    font-size: .58rem;
+    color: #3a4a5e;
+    letter-spacing: .15em;
+    position: relative; z-index: 1;
+  }
+
+  #typing-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px;
+    height: 1px;
+  }
+
+  .score-popup {
+    position: absolute;
+    font-family: var(--mono);
+    font-size: .7rem;
+    color: var(--cyan);
+    pointer-events: none;
+    animation: scoreFloat 1s ease forwards;
+    letter-spacing: .1em;
+    z-index: 10;
+  }
+
+  @keyframes scoreFloat {
+    from { opacity: 1; transform: translateY(0) translateX(-50%); }
+    to   { opacity: 0; transform: translateY(-40px) translateX(-50%); }
+  }
+
+  .combo-display {
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--orange);
+    letter-spacing: .2em;
+    height: 20px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── リザルト ── */
+  .result-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .result-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--cyan);
+    letter-spacing: .3em;
+    margin-bottom: 12px;
+  }
+
+  .result-rank {
+    font-family: var(--sans);
+    font-size: 5rem;
+    font-weight: 700;
+    letter-spacing: .2em;
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+
+  .rank-S { color: #ffd700; text-shadow: 0 0 24px rgba(255,215,0,.5); }
+  .rank-A { color: var(--cyan); text-shadow: 0 0 24px rgba(0,200,255,.5); }
+  .rank-B { color: var(--green); }
+  .rank-C { color: var(--orange); }
+  .rank-D { color: var(--muted); }
+
+  .result-rank-label {
+    font-family: var(--mono);
+    font-size: .6rem;
+    color: var(--muted);
+    letter-spacing: .2em;
+    margin-bottom: 28px;
+  }
+
+  .result-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .result-stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 20px 16px;
+  }
+
+  .result-stat-label {
+    font-family: var(--mono);
+    font-size: .55rem;
+    color: var(--muted);
+    letter-spacing: .15em;
+    margin-bottom: 8px;
+  }
+
+  .result-stat-val {
+    font-family: var(--mono);
+    font-size: 1.4rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: var(--sans);
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    padding: 14px 32px;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all .15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary   { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #0044cc; transform: translateY(-1px); }
+  .btn-secondary { background: var(--panel); color: var(--muted); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── ローディング・エラー ── */
+  .loading-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 48px;
+    text-align: center;
+  }
+
+  .loading-text {
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--cyan);
+    letter-spacing: .2em;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .error-box {
+    background: rgba(255,43,78,.06);
+    border: 1px solid rgba(255,43,78,.3);
+    border-left: 3px solid var(--red);
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: .65rem;
+    color: var(--red);
+    letter-spacing: .08em;
+    line-height: 2;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  footer {
+    background: var(--deep);
+    border-top: 1px solid rgba(0,200,255,.15);
+    padding: 24px 32px;
+    position: relative; z-index: 1;
+  }
+
+  .footer-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .f-title { font-family: var(--sans); font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: .15em; }
+  .f-copy  { font-family: var(--mono); font-size: .55rem; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    main { padding: 24px 16px 60px; }
+    .status-bar { grid-template-columns: repeat(2, 1fr); }
+    .diff-grid { grid-template-columns: 1fr; }
+    .result-stats { grid-template-columns: 1fr; }
+    .char-display { font-size: 1.8rem; }
+    .romaji-char { font-size: 1.1rem; }
+    .game-area { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="back-btn" href="games.html">← BACK TO GAMES</a>
+    <div class="header-divider"></div>
+    <div class="header-label">GAMES // TYPING</div>
+    <div class="header-title">TYPING <span>//</span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">NX</div>
+    <a href="index.html">TOP</a>
+    <a href="games.html" class="active">GAMES</a>
+    <a href="bbs.html">BBS</a>
+    <a href="#">DIARY</a>
+    <a href="note.html">NOTE</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ローディング -->
+  <div class="screen show" id="screen-loading">
+    <div class="loading-box">
+      <div class="loading-text">// LOADING WORD DATA...</div>
+    </div>
+  </div>
+
+  <!-- エラー通知 -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- タイトル画面 -->
+  <div class="screen" id="screen-title">
+    <div class="sec-head">
+      <span class="sec-num">TYPING</span>
+      <span class="sec-title">ANIME CHARACTER TYPING</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="title-hero">
+      <div class="title-label">// NEXUS TYPING SYSTEM</div>
+      <div class="title-name">ANIME <span>TYPING</span></div>
+      <div class="title-sub">アニメキャラの名前をタイピングしよう</div>
+
+      <div class="diff-grid">
+        <button class="diff-btn normal-btn" id="btn-normal">
+          <div class="diff-label">// DIFFICULTY 01</div>
+          <div class="diff-name">NORMAL</div>
+          <div class="diff-desc">8文字以内のキャラ名<br>テンポよく入力しよう</div>
+        </button>
+        <button class="diff-btn hard-btn" id="btn-hard">
+          <div class="diff-label">// DIFFICULTY 02</div>
+          <div class="diff-name">HARD</div>
+          <div class="diff-desc">9文字以上のキャラ名<br>フルネームに挑戦！</div>
+        </button>
+      </div>
+
+      <div class="title-note">
+        問題数: 20問 ／ 制限時間: 1問あたり10秒<br>
+        ミスなく打つとコンボボーナス！
+      </div>
+    </div>
+  </div>
+
+  <!-- ゲーム画面 -->
+  <div class="screen" id="screen-game">
+    <div class="status-bar">
+      <div class="stat-box">
+        <div class="stat-label">SCORE</div>
+        <div class="stat-val accent" id="stat-score">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">QUESTION</div>
+        <div class="stat-val" id="stat-q">1 / 20</div>
+      </div>
+      <div class="stat-box good">
+        <div class="stat-label">CORRECT</div>
+        <div class="stat-val good" id="stat-correct">0</div>
+      </div>
+      <div class="stat-box danger">
+        <div class="stat-label">MISS</div>
+        <div class="stat-val danger" id="stat-miss">0</div>
+      </div>
+    </div>
+
+    <div class="timer-wrap">
+      <div class="timer-bar" id="timer-bar"></div>
+    </div>
+
+    <div class="game-area" id="game-area">
+      <div class="miss-flash" id="miss-flash"></div>
+      <span class="difficulty-badge normal" id="diff-badge">NORMAL</span>
+      <div class="combo-display" id="combo-display"></div>
+      <div class="char-display" id="char-display">—</div>
+      <div class="romaji-display" id="romaji-display"></div>
+      <div class="next-preview" id="next-preview"></div>
+      <input type="text" id="typing-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="btn-quit">QUIT</button>
+    </div>
+  </div>
+
+  <!-- リザルト画面 -->
+  <div class="screen" id="screen-result">
+    <div class="sec-head">
+      <span class="sec-num">RESULT</span>
+      <span class="sec-title">GAME CLEAR</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-label">// FINAL RESULT</div>
+      <div class="result-rank" id="result-rank">S</div>
+      <div class="result-rank-label">RANK</div>
+
+      <div class="result-stats">
+        <div class="result-stat">
+          <div class="result-stat-label">SCORE</div>
+          <div class="result-stat-val" id="res-score">0</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">ACCURACY</div>
+          <div class="result-stat-val" id="res-acc">0%</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">MAX COMBO</div>
+          <div class="result-stat-val" id="res-combo">0</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">CORRECT</div>
+          <div class="result-stat-val" id="res-correct">0</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">MISS</div>
+          <div class="result-stat-val" id="res-miss">0</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">DIFFICULTY</div>
+          <div class="result-stat-val" id="res-diff">NORMAL</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-retry">▶ RETRY</button>
+      <button class="btn btn-secondary" id="btn-change-diff">難易度を変える</button>
+      <a class="btn btn-secondary" href="games.html">← GAMES</a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="f-title">NEXUS</div>
+    <div class="f-copy">&copy; 2025 NEXUS // TYPING MODULE</div>
+  </div>
+</footer>
+
+<script>
+// ══════════════════════════════════════
+//  定数
+// ══════════════════════════════════════
+const TOTAL_QUESTIONS  = 20;
+const TIME_PER_WORD    = 10;   // 秒
+const NORMAL_MAX_LEN   = 8;    // 8文字以内 → NORMAL
+const SCORE_BASE       = 100;
+const SCORE_SPEED_MAX  = 50;
+const SCORE_COMBO_UNIT = 20;
+
+// フォールバック用サンプルワード
+const FALLBACK = [
+  ['ナルト','naruto'],['サスケ','sasuke'],['サクラ','sakura'],['カカシ','kakashi'],
+  ['悟空','goku'],['ベジータ','vegeta'],['ピッコロ','piccolo'],
+  ['ルフィ','luffy'],['ゾロ','zoro'],['ナミ','nami'],['サンジ','sanji'],
+  ['炭治郎','tanjiro'],['禰豆子','nezuko'],['善逸','zenitsu'],['伊之助','inosuke'],
+  ['悟','gojo'],['伏黒','fushiguro'],['虎杖','itadori'],
+  ['エレン','eren'],['ミカサ','mikasa'],['アルミン','armin'],['リヴァイ','levi'],
+  ['サイタマ','saitama'],['ジェノス','genos'],
+  ['一護','ichigo'],['ルキア','rukia'],['藍染','aizen'],
+  ['デク','deku'],['爆豪','bakugo'],['轟','todoroki'],
+  ['煉獄杏寿郎','rengokukyojuro'],['宇髄天元','uzuitengen'],
+  ['竈門炭治郎','kamadotanjiro'],['時透無一郎','tokitomuichiro'],
+  ['オールマイト','allmight'],['エンデヴァー','endeavor'],
+  ['ロロノアゾロ','roronoazoro'],['モンキーDルフィ','monkeydluffy'],
+];
+
+// ══════════════════════════════════════
+//  状態
+// ══════════════════════════════════════
+let normalWords = [];
+let hardWords   = [];
+
+let state = {
+  difficulty: 'normal',
+  queue:      [],
+  qIndex:     0,
+  current:    null,
+  typed:      '',
+  score:      0,
+  correct:    0,
+  miss:       0,
+  combo:      0,
+  maxCombo:   0,
+  totalKeys:  0,
+  wrongKeys:  0,
+  timer:      null,
+  tickCount:  0,
+  wrongFlash: null,
+};
+
+// ══════════════════════════════════════
+//  DOM
+// ══════════════════════════════════════
+const $ = id => document.getElementById(id);
+const screens = {
+  loading: $('screen-loading'),
+  title:   $('screen-title'),
+  game:    $('screen-game'),
+  result:  $('screen-result'),
+};
+
+function showScreen(name) {
+  Object.values(screens).forEach(s => s.classList.remove('show'));
+  screens[name].classList.add('show');
+  if (name === 'game') setTimeout(() => $('typing-input').focus(), 100);
+}
+
+// ══════════════════════════════════════
+//  words.txt 読み込み
+// ══════════════════════════════════════
+async function loadWords() {
+  try {
+    const res = await fetch('words.txt');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    parseWords(text);
+  } catch (e) {
+    console.warn('words.txt を読み込めませんでした。サンプルデータを使用します:', e);
+    applyWords(FALLBACK.map(([d, r]) => ({ display: d, romaji: r })));
+    showError('words.txt が見つからないため、サンプルデータで動作中です。// words.txt をこのHTMLと同じフォルダに置いてください。');
+  }
+  showScreen('title');
+}
+
+function parseWords(text) {
+  const words = [];
+  for (const line of text.split('\n')) {
+    const t = line.trim();
+    if (!t || t.startsWith('#')) continue;
+    const i = t.indexOf(',');
+    if (i === -1) continue;
+    const display = t.slice(0, i).trim();
+    const romaji  = t.slice(i + 1).trim().toLowerCase();
+    if (display && romaji) words.push({ display, romaji });
+  }
+  if (words.length === 0) {
+    applyWords(FALLBACK.map(([d, r]) => ({ display: d, romaji: r })));
+    showError('words.txt の形式が正しくありません。「キャラ名,romaji」の形式で書いてください。');
+  } else {
+    applyWords(words);
+  }
+}
+
+function applyWords(words) {
+  normalWords = words.filter(w => w.romaji.length <= NORMAL_MAX_LEN);
+  hardWords   = words.filter(w => w.romaji.length >  NORMAL_MAX_LEN);
+  if (normalWords.length < 5) normalWords = words;
+  if (hardWords.length   < 5) hardWords   = words;
+}
+
+function showError(msg) {
+  const el = $('error-box');
+  el.textContent = '// NOTICE: ' + msg;
+  el.style.display = 'block';
+}
+
+// ══════════════════════════════════════
+//  ゲーム開始
+// ══════════════════════════════════════
+function startGame(diff) {
+  state.difficulty = diff;
+  state.qIndex     = 0;
+  state.score      = 0;
+  state.correct    = 0;
+  state.miss       = 0;
+  state.combo      = 0;
+  state.maxCombo   = 0;
+  state.totalKeys  = 0;
+  state.wrongKeys  = 0;
+  clearInterval(state.timer);
+
+  const pool = [...(diff === 'normal' ? normalWords : hardWords)];
+  shuffle(pool);
+  state.queue = pool.slice(0, TOTAL_QUESTIONS);
+  while (state.queue.length < TOTAL_QUESTIONS) {
+    const extra = [...pool];
+    shuffle(extra);
+    state.queue = state.queue.concat(extra);
+  }
+  state.queue = state.queue.slice(0, TOTAL_QUESTIONS);
+
+  $('diff-badge').textContent  = diff.toUpperCase();
+  $('diff-badge').className    = `difficulty-badge ${diff}`;
+
+  showScreen('game');
+  nextWord();
+}
+
+// ══════════════════════════════════════
+//  次のワード
+// ══════════════════════════════════════
+function nextWord() {
+  if (state.qIndex >= TOTAL_QUESTIONS) { endGame(); return; }
+
+  state.current   = state.queue[state.qIndex];
+  state.typed     = '';
+  state.tickCount = TIME_PER_WORD * 10; // 100msごと
+
+  renderWord();
+  updateStats();
+  startTimer();
+
+  const next = state.queue[state.qIndex + 1];
+  $('next-preview').textContent = next ? `NEXT → ${next.display}` : '// LAST QUESTION';
+}
+
+// ══════════════════════════════════════
+//  タイマー
+// ══════════════════════════════════════
+function startTimer() {
+  clearInterval(state.timer);
+  const total = state.tickCount;
+  $('timer-bar').style.width = '100%';
+  $('timer-bar').classList.remove('danger');
+
+  state.timer = setInterval(() => {
+    state.tickCount--;
+    const pct = (state.tickCount / total) * 100;
+    $('timer-bar').style.width = pct + '%';
+    if (pct < 30) $('timer-bar').classList.add('danger');
+
+    if (state.tickCount <= 0) {
+      clearInterval(state.timer);
+      // 時間切れ
+      state.combo = 0;
+      state.qIndex++;
+      updateStats();
+      renderCombo();
+      setTimeout(nextWord, 400);
+    }
+  }, 100);
+}
+
+// ══════════════════════════════════════
+//  描画
+// ══════════════════════════════════════
+function renderWord() {
+  const { current, typed } = state;
+  if (!current) return;
+
+  $('char-display').textContent = current.display;
+
+  const container = $('romaji-display');
+  container.innerHTML = '';
+  for (let i = 0; i < current.romaji.length; i++) {
+    const span = document.createElement('span');
+    span.className = 'romaji-char';
+    span.textContent = current.romaji[i];
+    if      (i < typed.length)  span.classList.add('done');
+    else if (i === typed.length) span.classList.add('current');
+    else                         span.classList.add('pending');
+    container.appendChild(span);
+  }
+}
+
+function updateStats() {
+  $('stat-score').textContent   = state.score.toLocaleString();
+  $('stat-q').textContent       = `${state.qIndex + 1} / ${TOTAL_QUESTIONS}`;
+  $('stat-correct').textContent = state.correct;
+  $('stat-miss').textContent    = state.miss;
+}
+
+function renderCombo() {
+  $('combo-display').textContent = state.combo >= 3 ? `🔥 ${state.combo} COMBO!` : '';
+}
+
+// ══════════════════════════════════════
+//  キー入力
+// ══════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  if (!screens.game.classList.contains('show')) return;
+  if (!state.current) return;
+  if (e.key.length !== 1) return;
+
+  const key      = e.key.toLowerCase();
+  const expected = state.current.romaji[state.typed.length];
+
+  state.totalKeys++;
+
+  if (key === expected) {
+    state.typed += key;
+    if (state.typed.length === state.current.romaji.length) {
+      wordComplete();
+    } else {
+      renderWord();
+    }
+  } else {
+    state.wrongKeys++;
+    state.miss++;
+    state.combo = 0;
+    flashMiss();
+    renderCombo();
+    updateStats();
+  }
+
+  $('typing-input').focus();
+});
+
+$('game-area').addEventListener('click', () => $('typing-input').focus());
+
+// ══════════════════════════════════════
+//  ワード完了
+// ══════════════════════════════════════
+function wordComplete() {
+  clearInterval(state.timer);
+
+  state.correct++;
+  state.combo++;
+  if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+
+  const timeRatio   = state.tickCount / (TIME_PER_WORD * 10);
+  const speedBonus  = Math.floor(timeRatio * SCORE_SPEED_MAX);
+  const comboBonus  = state.combo >= 3 ? SCORE_COMBO_UNIT * Math.floor(state.combo / 3) : 0;
+  const gained      = SCORE_BASE + speedBonus + comboBonus;
+  state.score      += gained;
+
+  showScorePopup(`+${gained}`);
+  renderWord();
+  renderCombo();
+  updateStats();
+
+  state.qIndex++;
+  setTimeout(nextWord, 300);
+}
+
+function flashMiss() {
+  const el = $('miss-flash');
+  el.classList.add('show');
+  clearTimeout(state.wrongFlash);
+  state.wrongFlash = setTimeout(() => el.classList.remove('show'), 150);
+}
+
+function showScorePopup(text) {
+  const pop = document.createElement('div');
+  pop.className = 'score-popup';
+  pop.textContent = text;
+  pop.style.top  = '38%';
+  pop.style.left = '50%';
+  $('game-area').appendChild(pop);
+  setTimeout(() => pop.remove(), 1000);
+}
+
+// ══════════════════════════════════════
+//  ゲーム終了
+// ══════════════════════════════════════
+function endGame() {
+  clearInterval(state.timer);
+
+  const acc = state.totalKeys > 0
+    ? Math.round((1 - state.wrongKeys / state.totalKeys) * 100)
+    : 100;
+
+  let rank, cls;
+  if      (acc >= 95 && state.correct >= 18) { rank = 'S'; cls = 'rank-S'; }
+  else if (acc >= 85 && state.correct >= 15) { rank = 'A'; cls = 'rank-A'; }
+  else if (acc >= 70 && state.correct >= 12) { rank = 'B'; cls = 'rank-B'; }
+  else if (acc >= 50 && state.correct >= 8)  { rank = 'C'; cls = 'rank-C'; }
+  else                                        { rank = 'D'; cls = 'rank-D'; }
+
+  const el = $('result-rank');
+  el.textContent = rank;
+  el.className   = `result-rank ${cls}`;
+
+  $('res-score').textContent   = state.score.toLocaleString();
+  $('res-acc').textContent     = acc + '%';
+  $('res-combo').textContent   = state.maxCombo;
+  $('res-correct').textContent = state.correct;
+  $('res-miss').textContent    = state.miss;
+  $('res-diff').textContent    = state.difficulty.toUpperCase();
+
+  showScreen('result');
+}
+
+// ══════════════════════════════════════
+//  ユーティリティ
+// ══════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// ══════════════════════════════════════
+//  ボタン
+// ══════════════════════════════════════
+$('btn-normal').addEventListener('click', () => startGame('normal'));
+$('btn-hard').addEventListener('click',   () => startGame('hard'));
+$('btn-quit').addEventListener('click',   () => { clearInterval(state.timer); showScreen('title'); });
+$('btn-retry').addEventListener('click',  () => startGame(state.difficulty));
+$('btn-change-diff').addEventListener('click', () => showScreen('title'));
+
+// ══════════════════════════════════════
+//  起動
+// ══════════════════════════════════════
+loadWords();
+</script>
+</body>
+</html>

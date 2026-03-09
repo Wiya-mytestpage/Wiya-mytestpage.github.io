@@ -1,0 +1,155 @@
+# ════════════════════════════════════
+# NEXUS TYPING - ワードリスト
+# 書き方: キャラ名,romaji
+# 行頭が # の行はコメントとして無視されます
+# NORMAL: ローマ字8文字以内
+# HARD  : ローマ字9文字以上
+# ════════════════════════════════════
+
+# ── NORMAL (8文字以内) ──────────────
+
+# ナルト
+ナルト,naruto
+サスケ,sasuke
+サクラ,sakura
+カカシ,kakashi
+ヒナタ,hinata
+ガアラ,gaara
+ネジ,neji
+
+# ドラゴンボール
+悟空,goku
+ベジータ,vegeta
+ピッコロ,piccolo
+フリーザ,freeza
+悟飯,gohan
+クリリン,krillin
+
+# ワンピース
+ルフィ,luffy
+ゾロ,zoro
+ナミ,nami
+サンジ,sanji
+ウソップ,usopp
+ロビン,robin
+ブルック,brook
+
+# 鬼滅の刃
+炭治郎,tanjiro
+禰豆子,nezuko
+善逸,zenitsu
+伊之助,inosuke
+カナヲ,kanao
+義勇,giyu
+しのぶ,shinobu
+
+# 呪術廻戦
+釘崎,kugisaki
+虎杖,itadori
+伏黒,fushiguro
+七海,nanami
+パンダ,panda
+
+# 進撃の巨人
+エレン,eren
+ミカサ,mikasa
+アルミン,armin
+リヴァイ,levi
+ハンジ,hange
+サシャ,sasha
+コニー,connie
+ジャン,jean
+
+# ワンパンマン
+サイタマ,saitama
+ジェノス,genos
+キング,king
+フブキ,fubuki
+ガロウ,garou
+
+# ブリーチ
+一護,ichigo
+ルキア,rukia
+白哉,byakuya
+藍染,aizen
+恋次,renji
+
+# ヒロアカ
+デク,deku
+爆豪,bakugo
+轟,todoroki
+麗日,uraraka
+飯田,iida
+上鳴,kaminari
+切島,kirishima
+
+# ハンターハンター
+ゴン,gon
+キルア,killua
+クラピカ,kurapika
+レオリオ,leorio
+ヒソカ,hisoka
+
+# ── HARD (9文字以上) ─────────────────
+
+# 鬼滅の刃（フルネーム）
+竈門炭治郎,kamadotanjiro
+竈門禰豆子,kamadonezuko
+煉獄杏寿郎,rengokukyojuro
+宇髄天元,uzuitengen
+時透無一郎,tokitomuichiro
+甘露寺蜜璃,kanrojimitsuri
+悲鳴嶼行冥,himejimagyomei
+不死川実弥,shinazugawasanemi
+胡蝶しのぶ,kochoshinobu
+冨岡義勇,tomiokagiyu
+
+# ワンピース（フルネーム）
+モンキーDルフィ,monkeydluffy
+ロロノアゾロ,roronoazoro
+ポートガスDエース,portgasdace
+ドンキホーテドフラミンゴ,donquixotedoflamingo
+
+# 呪術廻戦（フルネーム）
+虎杖悠仁,itadoriyuji
+伏黒恵,fushiguromegoru
+釘崎野薔薇,kugisakinobara
+五条悟,gojosatoru
+七海建人,nanamikenji
+
+# 進撃の巨人（フルネーム）
+エレンイェーガー,erenjeager
+ミカサアッカーマン,mikasaackerman
+アルミンアルレルト,arminarurelt
+リヴァイアッカーマン,leviackerman
+エルヴィンスミス,erwinsmith
+
+# ヒロアカ（フルネーム）
+緑谷出久,midoriyaizuku
+爆豪勝己,bakugokatsuki
+轟焦凍,todorokishoto
+麗日お茶子,urarakaochako
+飯田天哉,iidatenya
+オールマイト,allmight
+エンデヴァー,endeavor
+
+# ナルト（フルネーム）
+うずまきナルト,uzumakinaruto
+うちはサスケ,uchihasasuke
+はたけカカシ,hatakekakashi
+日向ヒナタ,hyugahinata
+
+# ドラゴンボール（フルネーム）
+孫悟空,songoku
+ピッコロ大魔王,piccolodaimao
+
+# ブリーチ（フルネーム）
+黒崎一護,kurosakiichigo
+朽木ルキア,kuchirukia
+朽木白哉,kuchibyakuya
+藍染惣右介,aizensosuke
+阿散井恋次,asaiirenji
+
+# ハンターハンター（フルネーム）
+ゴンフリークス,gonfreecss
+キルアゾルディック,kiruazoldyck
